@@ -26,8 +26,8 @@ public struct P256Plugin: DIDKeyPlugin {
     /// - Returns: `true` if the signature is valid, or `false` if not.
     ///
     /// - Throws: An error if the DID is not a valid p256 `did:key`.
-    public static func verifySignature(did: String, message: [UInt8], signature: [UInt8], options: VerifyOptions? = nil) async throws -> Bool {
-        return try await P256Operations.verifyDIDSignature(did: did, data: message, signature: signature, options: options)
+    public static func verifySignature(did: String, message: [UInt8], signature: [UInt8], options: VerifyOptions? = nil) throws -> Bool {
+        return try P256Operations.verifyDIDSignature(did: did, data: message, signature: signature, options: options)
     }
 
     /// Compresses an uncompressed p256 public key.

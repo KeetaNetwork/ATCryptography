@@ -12,7 +12,7 @@ import Testing
 @Suite("Signatures", .disabled()) struct SignatureTests {
 
     @Test("Verifies k256 and p256 signature vectors.", arguments: TestVectorEnum.signatureVectors, 1...TestVectorEnum.signatureVectors.count)
-    func verifySignatureVectors(signatureVector: TestVector, count: Int) async throws {
+    func verifySignatureVectors(signatureVector: TestVector, count: Int) throws {
         let messageBytes = signatureVector.base64Message.data(using: .utf8)?.base64EncodedString()
         let signatureBytes = signatureVector.base64Signature.data(using: .utf8)?.base64EncodedString()
         let keyBytes = try Multibase.multibaseToBytes(multibase: signatureVector.publicMultibaseKey)
@@ -23,7 +23,7 @@ import Testing
         switch signatureVector.algorithm {
             case "ES256":
                 if let messageBytes = messageBytes {
-                    let isSignatureValid = try await P256Operations.verifySignature(
+                    let isSignatureValid = try P256Operations.verifySignature(
                         publicKey: keyBytes,
                         data: messageBytes.bytes,
                         signature: signatureBytes?.bytes ?? [UInt8]()
@@ -33,7 +33,7 @@ import Testing
                 }
             case "ES256K":
                 if let messageBytes = messageBytes {
-                    let isSignatureValid = try await K256Operations.verifySignature(
+                    let isSignatureValid = try K256Operations.verifySignature(
                         publicKey: keyBytes,
                         data: messageBytes.bytes,
                         signature: signatureBytes?.bytes ?? [UInt8]()

@@ -70,7 +70,7 @@ public protocol DIDKeyPlugin: Sendable {
     /// - Returns: `true` if the signature is valid, otherwise `false`.
     ///
     /// - Throws: An error if the DID is not a valid P-256 `did:key`.
-    static func verifySignature(did: String, message: [UInt8], signature: [UInt8], options: VerifyOptions?) async throws -> Bool
+    static func verifySignature(did: String, message: [UInt8], signature: [UInt8], options: VerifyOptions?) throws -> Bool
 
     /// Compresses an uncompressed p256 public key.
     ///

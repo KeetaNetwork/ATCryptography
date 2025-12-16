@@ -21,7 +21,7 @@ public struct K256Operations {
     /// - Returns: `true` if the signature is valid, otherwise `false`.
     ///
     /// - Throws: An error if the DID is not a valid k256 `did:key`.
-    public static func verifyDIDSignature(did: String, data: [UInt8], signature: [UInt8], options: VerifyOptions? = nil) async throws -> Bool {
+    public static func verifyDIDSignature(did: String, data: [UInt8], signature: [UInt8], options: VerifyOptions? = nil) throws -> Bool {
         let prefixedBytes = try ATCryptographyTools.extractPrefixedBytes(from: ATCryptographyTools.extractMultikey(from: did))
 
         guard ATCryptographyTools.hasPrefix(bytes: prefixedBytes, prefix: k256DIDPrefix) else {
@@ -29,7 +29,7 @@ public struct K256Operations {
         }
 
         let keyBytes = Array(prefixedBytes.dropFirst(k256DIDPrefix.count))
-        return try await verifySignature(publicKey: keyBytes, data: data, signature: signature, options: options)
+        return try verifySignature(publicKey: keyBytes, data: data, signature: signature, options: options)
     }
 
     /// Verifies a k256 signature.
@@ -42,9 +42,9 @@ public struct K256Operations {
     /// - Returns: `true` if the signature is valid, or `false` if not.
     ///
     /// - Throws: An error if signature verification fails.
-    public static func verifySignature(publicKey: [UInt8], data: [UInt8], signature: [UInt8], options: VerifyOptions? = nil) async throws -> Bool {
+    public static func verifySignature(publicKey: [UInt8], data: [UInt8], signature: [UInt8], options: VerifyOptions? = nil) throws -> Bool {
         let allowMalleable = options?.areMalleableSignaturesAllowed ?? false
-        let hashedData = await SHA256Hasher.sha256(data)
+        let hashedData = SHA256Hasher.sha256(data)
 
         guard let publicKey = try? secp256k1.Signing.PublicKey(dataRepresentation: publicKey, format: .compressed) else {
             throw EllipticalCurveOperationsError.invalidPublicKey
@@ -101,14 +101,14 @@ public struct K256Operations {
     /// - Returns: `true` if the signature is valid, otherwise `false`.
     ///
     /// - Throws: An error if the DID is not a valid k256 `did:key`.
-    public static func verifyDIDSignature(did: String, data: [UInt8], sessionToken: SessionToken, options: VerifyOptions? = nil) async throws -> Bool {
+    public static func verifyDIDSignature(did: String, data: [UInt8], sessionToken: SessionToken, options: VerifyOptions? = nil) throws -> Bool {
         let jwt = sessionToken
 
         guard let signature = jwt.signature else {
             throw SignatureVerificationError.invalidEncoding(reason: "No valid signature found in the provided session token.")
         }
 
-        return try await verifyDIDSignature(did: did, data: data, signature: [UInt8](signature), options: options)
+        return try verifyDIDSignature(did: did, data: data, signature: [UInt8](signature), options: options)
     }
 
     /// Verifies a k256 signature from a session token.
@@ -125,13 +125,13 @@ public struct K256Operations {
     /// - Returns: `true` if the signature is valid, or `false` if not.
     ///
     /// - Throws: An error if signature verification fails.
-    public static func verifySignature(publicKey: [UInt8], data: [UInt8], sessionToken: SessionToken, options: VerifyOptions? = nil) async throws -> Bool {
+    public static func verifySignature(publicKey: [UInt8], data: [UInt8], sessionToken: SessionToken, options: VerifyOptions? = nil) throws -> Bool {
         let jwt = sessionToken
 
         guard let signature = jwt.signature else {
             throw SignatureVerificationError.invalidEncoding(reason: "No valid signature found in the provided session token.")
         }
 
-        return try await K256Operations.verifySignature(publicKey: publicKey, data: data, signature: [UInt8](signature), options: options)
+        return try K256Operations.verifySignature(publicKey: publicKey, data: data, signature: [UInt8](signature), options: options)
     }
 }

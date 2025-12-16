@@ -27,7 +27,7 @@ public struct SignatureVerifier {
         signature: [UInt8],
         options: VerifyOptions? = nil,
         jwtAlgorithm: String? = nil
-    ) async throws -> Bool {
+    ) throws -> Bool {
         let parsedDIDKey = try DIDKey.parseDIDKey(didKey)
 
         if let expectedAlgorithm = jwtAlgorithm, expectedAlgorithm != parsedDIDKey.jwtAlgorithm {
@@ -38,7 +38,7 @@ public struct SignatureVerifier {
             throw SignatureVerificationError.unsupportedAlgorithm(algorithm: parsedDIDKey.jwtAlgorithm)
         }
 
-        return try await pluginType.verifySignature(did: didKey, message: data, signature: signature, options: options)
+        return try pluginType.verifySignature(did: didKey, message: data, signature: signature, options: options)
     }
 
     /// Verifies a digital signature where the data and signature are given as UTF-8 and Base64URL strings.
@@ -51,7 +51,7 @@ public struct SignatureVerifier {
     /// - Returns: `true` if the signature is valid, otherwise `false`.
     ///
     /// - Throws: An error if decoding fails or signature verification fails.
-    public static func verifySignatureUTF8(didKey: String, data: String, signature: String, options: VerifyOptions? = nil) async throws -> Bool {
+    public static func verifySignatureUTF8(didKey: String, data: String, signature: String, options: VerifyOptions? = nil) throws -> Bool {
         guard let dataBytes = data.data(using: .utf8)?.map({ $0 }) else {
             throw SignatureVerificationError.invalidEncoding(reason: "Invalid UTF-8 string")
         }
@@ -62,7 +62,7 @@ public struct SignatureVerifier {
 
         let signatureBytes = [UInt8](signatureData) // Convert Data to [UInt8]
 
-        return try await verifySignature(didKey: didKey, data: dataBytes, signature: signatureBytes, options: options)
+        return try verifySignature(didKey: didKey, data: dataBytes, signature: signatureBytes, options: options)
     }
 
     // MARK: - With SessionToken
@@ -86,14 +86,14 @@ public struct SignatureVerifier {
         sessionToken: SessionToken,
         options: VerifyOptions? = nil,
         jwtAlgorithm: String? = nil
-    ) async throws -> Bool {
+    ) throws -> Bool {
         let jwt = sessionToken
 
         guard let signature = jwt.signature else {
             throw SignatureVerificationError.invalidEncoding(reason: "Invalid session token.")
         }
 
-        return try await SignatureVerifier.verifySignature(
+        return try SignatureVerifier.verifySignature(
             didKey: didKey,
             data: data,
             signature: [UInt8](signature),
@@ -115,7 +115,7 @@ public struct SignatureVerifier {
     /// - Returns: `true` if the signature is valid, otherwise `false`.
     ///
     /// - Throws: An error if decoding fails or signature verification fails.
-    public static func verifySignatureUTF8(didKey: String, data: String, sessionToken: SessionToken, options: VerifyOptions? = nil) async throws -> Bool {
+    public static func verifySignatureUTF8(didKey: String, data: String, sessionToken: SessionToken, options: VerifyOptions? = nil) throws -> Bool {
         let jwt = sessionToken
 
         guard let signature = jwt.signature,
@@ -123,6 +123,6 @@ public struct SignatureVerifier {
             throw SignatureVerificationError.invalidEncoding(reason: "Invalid session token.")
         }
 
-        return try await verifySignatureUTF8(didKey: didKey, data: data, signature: encodedSignatureString, options: options)
+        return try verifySignatureUTF8(didKey: didKey, data: data, signature: encodedSignatureString, options: options)
     }
 }
