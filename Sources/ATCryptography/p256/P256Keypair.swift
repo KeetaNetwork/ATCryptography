@@ -92,7 +92,19 @@ public struct P256Keypair: ExportableKeypair, Sendable {
         }
     }
 
-    /// Signs a message using the private key.
+    /// Signs a message using the private key synchronously.
+    ///
+    /// - Parameter message: The message to sign.
+    /// - Returns: The signature as a byte array.
+    ///
+    /// - Throws: An error if signing fails.
+    public func sign(message: [UInt8]) throws -> [UInt8] {
+        let hash = SHA256Hasher.sha256(message)
+        let signature = try privateKey.signature(for: Data(hash))
+        return Array(signature.rawRepresentation)
+    }
+    
+    /// Signs a message using the private key asynchronously.
     ///
     /// - Parameter message: The message to sign.
     /// - Returns: The signature as a byte array.
@@ -109,7 +121,7 @@ public struct P256Keypair: ExportableKeypair, Sendable {
     /// - Returns: The private key as a byte array.
     ///
     /// - Throws: `P256KeypairError.privateKeyNotExportable` if the keypair is not exportable.
-    public func export() async throws -> [UInt8] {
+    public func export() throws -> [UInt8] {
         guard isExportable else {
             throw EllipticalCurveKeypairError.privateKeyNotExportable
         }
